@@ -2,11 +2,17 @@
 #define SMOL_CORE3D_VEC4_DEFINED
 
 
+#include <compare>
+
+
 namespace Smol::Core3D
 {
 	template<typename T>
 	struct Vec4
 	{
+		friend auto operator<=>(const Vec4&, const Vec4&) = default;
+		
+		
 		T x;
 		
 		T y;
@@ -16,6 +22,7 @@ namespace Smol::Core3D
 		T w;
 		
 		
+	 public:
 		// Construct a zero vector.
 		constexpr Vec4() noexcept:
 			x(T(0)), y(T(0)), z(T(0)), w(T(0))

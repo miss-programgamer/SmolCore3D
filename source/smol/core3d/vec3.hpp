@@ -3,6 +3,7 @@
 
 
 #include <cmath>
+#include <compare>
 
 
 namespace Smol::Core3D
@@ -10,6 +11,9 @@ namespace Smol::Core3D
 	template<typename T>
 	struct Vec3
 	{
+		friend auto operator<=>(const Vec3&, const Vec3&) = default;
+		
+		
 		enum class Dir
 		{ Up, Down, Left, Right, Forward, Back };
 		

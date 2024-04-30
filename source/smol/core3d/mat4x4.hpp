@@ -6,6 +6,7 @@
 #include <numbers>
 #include <array>
 #include <stdexcept>
+#include <compare>
 
 #include "vec3.hpp"
 #include "vec4.hpp"
@@ -16,6 +17,9 @@ namespace Smol::Core3D
 	template<typename T>
 	struct Mat4x4
 	{
+		friend auto operator<=>(const Mat4x4&, const Mat4x4&) = default;
+		
+		
 		std::array<Vec4<T>, 4> rows;
 		
 		
