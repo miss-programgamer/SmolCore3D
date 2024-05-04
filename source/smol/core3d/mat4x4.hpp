@@ -190,31 +190,133 @@ namespace Smol::Core3D
 		}
 		
 		// Construct a 4x4 euler rotation matrix.
-		static inline Mat4x4<float> EulerRotation(float yaw, float pitch, float roll = 0.0f)
+		static inline Mat4x4<float> EulerRotation(float pitch, float yaw)
 		{
-			const float yaw_rads = yaw * float(std::numbers::pi) / 180.0f;
-			const float ysin = std::sin(yaw_rads);
-			const float ycos = std::cos(yaw_rads);
-			
 			const float pitch_rads = pitch * float(std::numbers::pi) / 180.0f;
-			const float psin = std::sin(pitch_rads);
-			const float pcos = std::cos(pitch_rads);
+			const float sinp = std::sin(pitch_rads);
+			const float cosp = std::cos(pitch_rads);
+			
+			const float yaw_rads = yaw * float(std::numbers::pi) / 180.0f;
+			const float siny = std::sin(yaw_rads);
+			const float cosy = std::cos(yaw_rads);
+			
+			const float values[16]
+			{
+				cosy,  siny * sinp, -siny * cosp, 0.0f,
+				0.0f,         cosp,         sinp, 0.0f,
+				siny, -cosy * sinp,  cosy * cosp, 0.0f,
+				0.0f,         0.0f,         0.0f, 1.0f,
+			};
+			
+			return Mat4x4<float>(values);
+		}
+		
+		// Construct a 4x4 euler rotation matrix.
+		static inline Mat4x4<float> EulerRotation(float pitch, float yaw, float roll)
+		{
+			const float pitch_rads = pitch * float(std::numbers::pi) / 180.0f;
+			const float sinp = std::sin(pitch_rads);
+			const float cosp = std::cos(pitch_rads);
+			
+			const float yaw_rads = yaw * float(std::numbers::pi) / 180.0f;
+			const float siny = std::sin(yaw_rads);
+			const float cosy = std::cos(yaw_rads);
 			
 			const float roll_rads = roll * float(std::numbers::pi) / 180.0f;
-			const float rsin = std::sin(roll_rads);
-			const float rcos = std::cos(roll_rads);
+			const float sinr = std::sin(roll_rads);
+			const float cosr = std::cos(roll_rads);
 			
-			// const float values[16]
-			// {
-			// 	 cos, -sin, 0.0f, 0.0f,
-			// 	 sin,  cos, 0.0f, 0.0f,
-			// 	0.0f, 0.0f, 1.0f, 0.0f,
-			// 	0.0f, 0.0f, 0.0f, 1.0f,
-			// };
+			const float m11 = cosr * cosy;
+			const float m21 = -sinr * cosy;
+			const float m31 = siny;
+			const float m12 = (cosr * siny * sinp) + (sinr * cosp);
+			const float m22 = (-sinr * siny * sinp) + (cosr * cosp);
+			const float m32 = -cosy * sinp;
+			const float m13 = (-cosr * siny * cosp) + (sinr * sinp);
+			const float m23 = (sinr * siny * cosp) + (cosr * sinp);
+			const float m33 = cosy * cosp;
 			
-			// return Mat4x4<float>(values);
+			const float values[16]
+			{
+				 m11,  m12,  m13, 0.0f,
+				 m21,  m22,  m23, 0.0f,
+				 m31,  m32,  m33, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f,
+			};
 			
-			throw std::exception("not implemented");
+			return Mat4x4<float>(values);
+		}
+		
+		// Construct a 4x4 euler rotation matrix.
+		static inline Mat4x4<float> EulerRotation(const Vec3<float>& euler)
+		{
+			const float x_rads = euler.x * float(std::numbers::pi) / 180.0f;
+			const float sinx = std::sin(x_rads);
+			const float cosx = std::cos(x_rads);
+			
+			const float y_rads = euler.y * float(std::numbers::pi) / 180.0f;
+			const float siny = std::sin(y_rads);
+			const float cosy = std::cos(y_rads);
+			
+			const float z_rads = euler.z * float(std::numbers::pi) / 180.0f;
+			const float sinz = std::sin(z_rads);
+			const float cosz = std::cos(z_rads);
+			
+			const float m11 = cosz * cosy;
+			const float m21 = -sinz * cosy;
+			const float m31 = siny;
+			const float m12 = (cosz *siny * sinx) + (sinz * cosx);
+			const float m22 = (-sinz * siny * sinx) + (cosz * cosx);
+			const float m32 = -cosy * sinx;
+			const float m13 = (-cosz * siny * cosx) + (sinz * sinx);
+			const float m23 = (sinz * siny * cosx) + (cosz * sinx);
+			const float m33 = cosy * cosx;
+			
+			const float values[16]
+			{
+				 m11,  m12,  m13, 0.0f,
+				 m21,  m22,  m23, 0.0f,
+				 m31,  m32,  m33, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f,
+			};
+			
+			return Mat4x4<float>(values);
+		}
+		
+		// Construct a transform matrix from a position and euler angles.
+		static inline Mat4x4 Transform(const Vec3<float>& pos, const Vec3<float>& euler)
+		{
+			const float x_rads = euler.x * float(std::numbers::pi) / 180.0f;
+			const float sinx = std::sin(x_rads);
+			const float cosx = std::cos(x_rads);
+			
+			const float y_rads = euler.y * float(std::numbers::pi) / 180.0f;
+			const float siny = std::sin(y_rads);
+			const float cosy = std::cos(y_rads);
+			
+			const float z_rads = euler.z * float(std::numbers::pi) / 180.0f;
+			const float sinz = std::sin(z_rads);
+			const float cosz = std::cos(z_rads);
+			
+			const float m11 = cosz * cosy;
+			const float m21 = -sinz * cosy;
+			const float m31 = siny;
+			const float m12 = (cosz *siny * sinx) + (sinz * cosx);
+			const float m22 = (-sinz * siny * sinx) + (cosz * cosx);
+			const float m32 = -cosy * sinx;
+			const float m13 = (-cosz * siny * cosx) + (sinz * sinx);
+			const float m23 = (sinz * siny * cosx) + (cosz * sinx);
+			const float m33 = cosy * cosx;
+			
+			const float values[16]
+			{
+				  m11,   m12,   m13, 0.0f,
+				  m21,   m22,   m23, 0.0f,
+				  m31,   m32,   m33, 0.0f,
+				pos.x, pos.y, pos.z, 1.0f,
+			};
+			
+			return Mat4x4<float>(values);
 		}
 		
 		// Construct a perspective 4x4 matrix.
@@ -223,18 +325,18 @@ namespace Smol::Core3D
 			const float scale = 1.0f / std::tan(fov * (float(std::numbers::pi) / 360.0f));
 			const float range = far_plane - near_plane;
 			
-			const float v0x0 = scale / aspect;
-			const float v1x1 = scale;
-			const float v2x2 = (-near_plane - far_plane) / range;
-			const float v3x2 = 1.0f;
-			const float v2x3 = 2.0f * far_plane * near_plane / range;
+			const float m11 = scale / aspect;
+			const float m22 = scale;
+			const float m33 = (-near_plane - far_plane) / range;
+			const float m34 = 1.0f;
+			const float m43 = 2.0f * far_plane * near_plane / range;
 			
 			const float values[16]
 			{
-				v0x0, 0.0f, 0.0f, 0.0f,
-				0.0f, v1x1, 0.0f, 0.0f,
-				0.0f, 0.0f, v2x2, v3x2,
-				0.0f, 0.0f, v2x3, 0.0f,
+				 m11, 0.0f, 0.0f, 0.0f,
+				0.0f,  m22, 0.0f, 0.0f,
+				0.0f, 0.0f,  m33,  m34,
+				0.0f, 0.0f,  m43, 0.0f,
 			};
 			
 			return Mat4x4<float>(values);
